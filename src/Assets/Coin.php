@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace MultipleChain\Bitcoin\Assets;
 
 use MultipleChain\Utils\Number;
+use MultipleChain\Bitcoin\Utils;
+use MultipleChain\Enums\ErrorType;
 use MultipleChain\Bitcoin\Provider;
+use MultipleChain\Bitcoin\TransactionData;
 use MultipleChain\Interfaces\ProviderInterface;
 use MultipleChain\Interfaces\Assets\CoinInterface;
 use MultipleChain\Bitcoin\Services\TransactionSigner;
@@ -30,7 +33,7 @@ class Coin implements CoinInterface
      */
     public function getName(): string
     {
-        return 'Coin';
+        return 'Bitcoin';
     }
 
     /**
@@ -38,7 +41,7 @@ class Coin implements CoinInterface
      */
     public function getSymbol(): string
     {
-        return 'COIN';
+        return 'BTC';
     }
 
     /**
@@ -46,7 +49,7 @@ class Coin implements CoinInterface
      */
     public function getDecimals(): int
     {
-        return 18;
+        return 8;
     }
 
     /**
@@ -55,8 +58,16 @@ class Coin implements CoinInterface
      */
     public function getBalance(string $owner): Number
     {
-        $this->provider->isTestnet(); // just for phpstan
-        return new Number(0);
+        $result = $this->provider->createRequest('address/' . $owner);
+
+        if (is_null($result)) {
+            return new Number(0);
+        }
+        // @phpcs:ignore
+        $stat = $result->chain_stats;
+        // @phpcs:ignore
+        $sat = $stat->funded_txo_sum - $stat->spent_txo_sum;
+        return new Number(Utils::fromSatoshi($sat), $this->getDecimals());
     }
 
     /**
@@ -67,6 +78,27 @@ class Coin implements CoinInterface
      */
     public function transfer(string $sender, string $receiver, float $amount): TransactionSigner
     {
-        return new TransactionSigner('example');
+        if ($amount < 0) {
+            throw new \RuntimeException(ErrorType::INVALID_AMOUNT->value);
+        }
+
+        if ($amount > $this->getBalance($sender)->toFloat()) {
+            throw new \RuntimeException(ErrorType::INSUFFICIENT_BALANCE->value);
+        }
+
+        if (strtolower($sender) === strtolower($receiver)) {
+            throw new \RuntimeException(ErrorType::INVALID_ADDRESS->value);
+        }
+
+        $sat = Utils::toSatoshi($amount);
+        $utxos = $this->provider->createRequest('address/' . $sender . '/utxo');
+
+        return new TransactionSigner(
+            (new TransactionData())
+            ->setFrom($sender)
+            ->setTo($receiver)
+            ->setAmount($sat)
+            ->setUtxos($utxos)
+        );
     }
 }
