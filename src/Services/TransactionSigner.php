@@ -82,6 +82,9 @@ class TransactionSigner implements TransactionSignerInterface
         $from = $this->addressCreator->fromString($this->rawData->getFrom());
 
         $total = 0;
+        /**
+         * @var object{'value': int, 'txid': string, 'vout': int} $utxo
+         */
         foreach ($utxos as $utxo) {
             $total += $utxo->value;
             $transaction->input($utxo->txid, $utxo->vout);
@@ -119,13 +122,20 @@ class TransactionSigner implements TransactionSignerInterface
         }
 
         $curl = curl_init($api);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $result = curl_exec($curl);
-        curl_close($curl);
 
-        $fees = json_decode($result, true);
-        $size = ($input * 148) + ($output * 34) + 10;
-        return $fees[self::FEE_LEVEL_MAP[$feeLevel]] * $size;
+        if (false !== $curl) {
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            $res = curl_exec($curl);
+            curl_close($curl);
+
+            $res = is_bool($res) ? '' : $res;
+            $fees = json_decode($res, true);
+            $feeRate = $fees[self::FEE_LEVEL_MAP[$feeLevel]];
+        } else {
+            $feeRate = 60;
+        }
+
+        return $feeRate * (($input * 148) + ($output * 34) + 10);
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MultipleChain\Bitcoin\Tests\Models;
 
+use MultipleChain\Utils;
 use MultipleChain\Enums\AssetDirection;
 use MultipleChain\Enums\TransactionType;
 use MultipleChain\Enums\TransactionStatus;
@@ -18,12 +19,17 @@ class CoinTransactionTest extends BaseTest
     private CoinTransaction $tx;
 
     /**
+     * @var string
+     */
+    private string $txId = '335c8a251e5f18121977c3159f46983d5943325abccc19e4718c49089553d60c';
+
+    /**
      * @return void
      */
     public function setUp(): void
     {
         parent::setUp();
-        $this->tx = new CoinTransaction($this->data->coinTransferTx);
+        $this->tx = new CoinTransaction($this->txId);
     }
 
     /**
@@ -33,7 +39,7 @@ class CoinTransactionTest extends BaseTest
     {
         $this->assertEquals(
             strtolower($this->tx->getReceiver()),
-            strtolower($this->data->modelTestReceiver)
+            strtolower($this->data->receiverAddress)
         );
     }
 
@@ -44,7 +50,7 @@ class CoinTransactionTest extends BaseTest
     {
         $this->assertEquals(
             strtolower($this->tx->getSender()),
-            strtolower($this->data->modelTestSender)
+            strtolower($this->data->senderAddress)
         );
     }
 
@@ -55,7 +61,7 @@ class CoinTransactionTest extends BaseTest
     {
         $this->assertEquals(
             $this->tx->getAmount()->toString(),
-            (string) $this->data->coinAmount
+            Utils::toString($this->data->transferAmount, 8)
         );
     }
 
@@ -78,8 +84,8 @@ class CoinTransactionTest extends BaseTest
         $this->assertEquals(
             $this->tx->verifyTransfer(
                 AssetDirection::INCOMING,
-                $this->data->modelTestReceiver,
-                $this->data->coinAmount
+                $this->data->receiverAddress,
+                $this->data->transferAmount
             ),
             TransactionStatus::CONFIRMED
         );
@@ -87,8 +93,8 @@ class CoinTransactionTest extends BaseTest
         $this->assertEquals(
             $this->tx->verifyTransfer(
                 AssetDirection::OUTGOING,
-                $this->data->modelTestSender,
-                $this->data->coinAmount
+                $this->data->senderAddress,
+                $this->data->transferAmount
             ),
             TransactionStatus::CONFIRMED
         );
@@ -96,8 +102,8 @@ class CoinTransactionTest extends BaseTest
         $this->assertEquals(
             $this->tx->verifyTransfer(
                 AssetDirection::INCOMING,
-                $this->data->modelTestSender,
-                $this->data->coinAmount
+                $this->data->senderAddress,
+                $this->data->transferAmount
             ),
             TransactionStatus::FAILED
         );

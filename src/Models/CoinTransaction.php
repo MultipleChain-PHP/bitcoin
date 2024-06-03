@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MultipleChain\Bitcoin\Models;
 
 use MultipleChain\Utils\Number;
+use MultipleChain\Bitcoin\Utils;
 use MultipleChain\Enums\AssetDirection;
 use MultipleChain\Enums\TransactionStatus;
 use MultipleChain\Interfaces\Models\CoinTransactionInterface;
@@ -16,7 +17,7 @@ class CoinTransaction extends Transaction implements CoinTransactionInterface
      */
     public function getReceiver(): string
     {
-        return '0x';
+        return $this->getData()?->vout[0]->scriptpubkey_address ?? '';
     }
 
     /**
@@ -24,7 +25,7 @@ class CoinTransaction extends Transaction implements CoinTransactionInterface
      */
     public function getSender(): string
     {
-        return '0x';
+        return $this->getSigner();
     }
 
     /**
@@ -32,7 +33,7 @@ class CoinTransaction extends Transaction implements CoinTransactionInterface
      */
     public function getAmount(): Number
     {
-        return new Number('0');
+        return new Number(Utils::fromSatoshi($this->getData()?->vout[0]->value ?? 0), 8);
     }
 
     /**
@@ -43,6 +44,26 @@ class CoinTransaction extends Transaction implements CoinTransactionInterface
      */
     public function verifyTransfer(AssetDirection $direction, string $address, float $amount): TransactionStatus
     {
-        return TransactionStatus::PENDING;
+        $status = $this->getStatus();
+
+        if (TransactionStatus::PENDING === $status) {
+            return TransactionStatus::PENDING;
+        }
+
+        if ($this->getAmount()->toFloat() !== $amount) {
+            return TransactionStatus::FAILED;
+        }
+
+        if (AssetDirection::INCOMING === $direction) {
+            if (strtolower($this->getReceiver()) !== strtolower($address)) {
+                return TransactionStatus::FAILED;
+            }
+        } else {
+            if (strtolower($this->getSender()) !== strtolower($address)) {
+                return TransactionStatus::FAILED;
+            }
+        }
+
+        return TransactionStatus::CONFIRMED;
     }
 }

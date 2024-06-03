@@ -144,7 +144,8 @@ class Provider implements ProviderInterface
         $info = curl_getinfo($curl);
 
         if (false === $response || 200 !== $info['http_code']) {
-            preg_match('/\{.*\}/', $response, $matches);
+            $res = is_bool($response) ? '' : $response;
+            preg_match('/\{.*\}/', $res, $matches);
             if (!empty($matches)) {
                 $jsonString = $matches[0];
                 $errorData = json_decode($jsonString, true);
@@ -159,12 +160,9 @@ class Provider implements ProviderInterface
             }
         }
 
-        if (false === $response) {
-            return null;
-        }
-
         curl_close($curl);
 
+        $response = is_bool($response) ? '' : $response;
         return $this->isJson($response) ? json_decode($response) : $response;
     }
 

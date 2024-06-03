@@ -84,8 +84,6 @@ class CoinTest extends BaseTest
 
         $transferNumber = new Number($this->data->transferAmount);
 
-        $this->assertTrue(true);
-        return;
         $this->assertEquals(
             $afterBalance->toString(),
             $beforeBalance->add($transferNumber)->toString()

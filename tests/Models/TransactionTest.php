@@ -17,12 +17,17 @@ class TransactionTest extends BaseTest
     private Transaction $tx;
 
     /**
+     * @var string
+     */
+    private string $txId = '335c8a251e5f18121977c3159f46983d5943325abccc19e4718c49089553d60c';
+
+    /**
      * @return void
      */
     public function setUp(): void
     {
         parent::setUp();
-        $this->tx = new Transaction($this->data->coinTransferTx);
+        $this->tx = new Transaction($this->txId);
     }
 
     /**
@@ -30,7 +35,7 @@ class TransactionTest extends BaseTest
      */
     public function testId(): void
     {
-        $this->assertEquals($this->data->coinTransferTx, $this->tx->getId());
+        $this->assertEquals($this->txId, $this->tx->getId());
     }
 
     /**
@@ -73,7 +78,7 @@ class TransactionTest extends BaseTest
      */
     public function testSender(): void
     {
-        $this->assertEquals(strtolower($this->data->modelTestSender), strtolower($this->tx->getSigner()));
+        $this->assertEquals(strtolower($this->data->senderAddress), strtolower($this->tx->getSigner()));
     }
 
     /**
@@ -81,7 +86,7 @@ class TransactionTest extends BaseTest
      */
     public function testFee(): void
     {
-        $this->assertEquals(0.000371822357865, $this->tx->getFee()->toFloat());
+        $this->assertEquals(0.00014, $this->tx->getFee()->toFloat());
     }
 
     /**
@@ -89,7 +94,7 @@ class TransactionTest extends BaseTest
      */
     public function testBlockNumber(): void
     {
-        $this->assertEquals(5461884, $this->tx->getBlockNumber());
+        $this->assertEquals(2814543, $this->tx->getBlockNumber());
     }
 
     /**
@@ -97,7 +102,7 @@ class TransactionTest extends BaseTest
      */
     public function testBlockTimestamp(): void
     {
-        $this->assertEquals(1710141144, $this->tx->getBlockTimestamp());
+        $this->assertEquals(1715328679, $this->tx->getBlockTimestamp());
     }
 
     /**
@@ -105,7 +110,7 @@ class TransactionTest extends BaseTest
      */
     public function testBlockConfirmationCount(): void
     {
-        $this->assertGreaterThan(129954, $this->tx->getBlockConfirmationCount());
+        $this->assertGreaterThan(13, $this->tx->getBlockConfirmationCount());
     }
 
     /**
