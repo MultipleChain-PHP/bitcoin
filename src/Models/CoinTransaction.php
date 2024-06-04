@@ -6,6 +6,7 @@ namespace MultipleChain\Bitcoin\Models;
 
 use MultipleChain\Utils\Number;
 use MultipleChain\Bitcoin\Utils;
+use MultipleChain\Bitcoin\Assets\Coin;
 use MultipleChain\Enums\AssetDirection;
 use MultipleChain\Enums\TransactionStatus;
 use MultipleChain\Interfaces\Models\CoinTransactionInterface;
@@ -33,7 +34,8 @@ class CoinTransaction extends Transaction implements CoinTransactionInterface
      */
     public function getAmount(): Number
     {
-        return new Number(Utils::fromSatoshi($this->getData()?->vout[0]->value ?? 0), 8);
+        $decimals = (new Coin())->getDecimals();
+        return new Number(Utils::fromSatoshi($this->getData()?->vout[0]->value ?? 0), $decimals);
     }
 
     /**

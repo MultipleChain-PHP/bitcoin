@@ -8,6 +8,7 @@ use MultipleChain\Utils\Number;
 use MultipleChain\Bitcoin\Utils;
 use MultipleChain\Enums\ErrorType;
 use MultipleChain\Bitcoin\Provider;
+use MultipleChain\Bitcoin\Assets\Coin;
 use MultipleChain\Enums\TransactionType;
 use MultipleChain\Enums\TransactionStatus;
 use MultipleChain\Interfaces\ProviderInterface;
@@ -149,7 +150,8 @@ class Transaction implements TransactionInterface
      */
     public function getFee(): Number
     {
-        return new Number(Utils::fromSatoshi($this->getData()?->fee ?? 0), 8);
+        $decimals = (new Coin())->getDecimals();
+        return new Number(Utils::fromSatoshi($this->getData()?->fee ?? 0), $decimals);
     }
 
     /**

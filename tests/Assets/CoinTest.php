@@ -84,7 +84,7 @@ class CoinTest extends BaseTest
 
         $afterBalance = $this->coin->getBalance($this->data->receiverAddress);
 
-        $transferNumber = new Number($this->data->transferAmount);
+        $transferNumber = new Number($this->data->transferAmount, $this->coin->getDecimals());
 
         $this->assertEquals(
             $afterBalance->toString(),
