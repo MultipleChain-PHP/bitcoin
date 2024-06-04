@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7ca7c5ce2d1f48c957983b921c61c61c",
+    "content-hash": "08258a4f2ff04f1eb6992bb9cabce7a7",
     "packages": [
         {
             "name": "bitwasp/bech32",
@@ -262,16 +262,16 @@
         },
         {
             "name": "multiplechain/definitions",
-            "version": "0.1.1",
+            "version": "0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/MultipleChain-PHP/definitions.git",
-                "reference": "ea5c0c0c67950036af2a844810339ec5f78c3e38"
+                "reference": "2990c9f1356e3ebfa578df8bcc47c9eb617002db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/MultipleChain-PHP/definitions/zipball/ea5c0c0c67950036af2a844810339ec5f78c3e38",
-                "reference": "ea5c0c0c67950036af2a844810339ec5f78c3e38",
+                "url": "https://api.github.com/repos/MultipleChain-PHP/definitions/zipball/2990c9f1356e3ebfa578df8bcc47c9eb617002db",
+                "reference": "2990c9f1356e3ebfa578df8bcc47c9eb617002db",
                 "shasum": ""
             },
             "require": {
@@ -301,9 +301,9 @@
             "description": "MultipleChain Definitions",
             "support": {
                 "issues": "https://github.com/MultipleChain-PHP/definitions/issues",
-                "source": "https://github.com/MultipleChain-PHP/definitions/tree/0.1.1"
+                "source": "https://github.com/MultipleChain-PHP/definitions/tree/0.1.2"
             },
-            "time": "2024-06-01T19:11:26+00:00"
+            "time": "2024-06-04T06:08:20+00:00"
         },
         {
             "name": "multiplechain/utils",
