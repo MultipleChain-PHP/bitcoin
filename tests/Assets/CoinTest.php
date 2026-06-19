@@ -8,6 +8,7 @@ use MultipleChain\Utils\Number;
 use MultipleChain\Bitcoin\Assets\Coin;
 use MultipleChain\Bitcoin\Tests\BaseTest;
 use MultipleChain\Bitcoin\Models\Transaction;
+use MultipleChain\Bitcoin\Services\TransactionSigner;
 
 class CoinTest extends BaseTest
 {
@@ -71,12 +72,12 @@ class CoinTest extends BaseTest
             $this->data->transferAmount
         );
 
-        $signer = $signer->sign($this->data->senderPrivateKey);
-
         if (!$this->data->coinTransferTestIsActive) {
-            $this->assertTrue(true);
+            $this->assertInstanceOf(TransactionSigner::class, $signer);
             return;
         }
+
+        $signer = $signer->sign($this->data->senderPrivateKey);
 
         $beforeBalance = $this->coin->getBalance($this->data->receiverAddress);
 
