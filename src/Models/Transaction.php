@@ -179,8 +179,15 @@ class Transaction implements TransactionInterface
             return 0;
         }
 
-        $latestBlock = $this->provider->createRequest('blocks/tip/height');
-        return (int) (intval($latestBlock) - $data->status?->block_height ?: 0);
+        $blockHeight = $data->status?->block_height ?? null;
+        if (null === $blockHeight) {
+            return 0;
+        }
+
+        $latestBlock = (int) $this->provider->createRequest('blocks/tip/height');
+        $confirmations = $latestBlock - (int) $blockHeight + 1;
+
+        return $confirmations < 0 ? 0 : $confirmations;
     }
 
     /**
@@ -193,12 +200,12 @@ class Transaction implements TransactionInterface
             return TransactionStatus::PENDING;
         }
 
-        if (isset($data?->status?->block_height)) {
-            if (isset($data?->status?->confirmed)) {
+        if (isset($data->status?->block_height)) {
+            if (!empty($data->status->confirmed)) {
                 return TransactionStatus::CONFIRMED;
-            } else {
-                return TransactionStatus::FAILED;
             }
+
+            return TransactionStatus::FAILED;
         }
         return TransactionStatus::PENDING;
     }
